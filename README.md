@@ -130,4 +130,4 @@ BYCustomTextField is a customizable text input component developed using Swift a
 
 ---
 
-[MIT]()
+[MIT](https://github.com/bayramyelec/BYCustomTextField/blob/65f4a2e3aca709b2ef96086152488ee37d310de1/LICENSE)
