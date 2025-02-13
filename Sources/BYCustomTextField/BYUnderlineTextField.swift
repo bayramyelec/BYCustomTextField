@@ -9,9 +9,15 @@ import UIKit
 
 public class BYUnderlineTextField: UIView {
     
+    // MARK: VARIABLES
+    
     private var placeHolderText: String?
     private var alertMessage: String?
     private var validMessage: String?
+    
+    public var text: String? {
+        return textField.text
+    }
     
     public var backColor : UIColor? {
         didSet {
@@ -31,6 +37,8 @@ public class BYUnderlineTextField: UIView {
             leftIcon.tintColor = underlineColor
         }
     }
+    
+    // MARK: COMPONENTS
     
     private var underLine: UIView = {
         let view = UIView()
@@ -93,15 +101,32 @@ public class BYUnderlineTextField: UIView {
         return label
     }()
     
+    // MARK: ICON WIDTH
+    
     private var cleanIconWidthConstraint: NSLayoutConstraint!
     private var infoIconWidthConstraint: NSLayoutConstraint!
     
-    public init(leftIcon: UIImage, placeholder: String, alertMessage: String, validMessage: String, underlineColor: UIColor) {
+    // MARK: IS VALID
+    
+    private var characters: [String] = []
+    
+    private func isValidFunc() -> Bool {
+        guard let text = textField.text else { return false }
+        if characters.isEmpty {
+            return true
+        }
+        return characters.allSatisfy { text.contains($0) }
+    }
+    
+    // MARK: INIT
+    
+    public init(leftIcon: UIImage, placeholder: String, alertMessage: String, validMessage: String, underlineColor: UIColor, characters: [String]) {
         self.placeHolderText = placeholder
         self.alertMessage = alertMessage
         self.validMessage = validMessage
         self.underlineColor = underlineColor
         self.leftIcon.image = leftIcon
+        self.characters = characters
         super.init(frame: .zero)
         setupUI()
         configure()
@@ -118,6 +143,8 @@ public class BYUnderlineTextField: UIView {
     public override var intrinsicContentSize: CGSize {
         return CGSizeMake(UIView.noIntrinsicMetric, 70)
     }
+    
+    // MARK: FUNCTIONS
     
     private func setupUI() {
         addSubview(backView)
@@ -193,63 +220,56 @@ public class BYUnderlineTextField: UIView {
     
     @objc private func textFieldDidChange() {
         textFieldChange()
-        
     }
     
     private func textFieldChange(){
         if let text = textField.text, !text.isEmpty {
-            UIView.animate(withDuration: 0.1) {
-                self.placeholderLabel.alpha = 0
-            }
-            UIView.animate(withDuration: 0.2) {
-                self.cleanIconWidthConstraint.constant = 20
-                self.cleanIcon.alpha = 1
-                self.layoutIfNeeded()
-            }
+            setAnimation(
+                cleanIconAlpha: 1,
+                cleanIconWidth: 20,
+                placeholderAlpha: 0
+            )
             setupContains()
         } else {
-            UIView.animate(withDuration: 0.2) {
-                self.placeholderLabel.alpha = 1
-                self.alertLabel.text = ""
-                self.cleanIcon.alpha = 0
-                self.infoIcon.alpha = 0
-                self.cleanIconWidthConstraint.constant = 1
-                self.infoIconWidthConstraint.constant = 1
-                self.layoutIfNeeded()
-                self.backView.layer.borderColor = UIColor.systemGray.cgColor
-                self.placeholderLabel.textColor = .systemGray
-                self.infoIcon.tintColor = .systemGray
-                self.leftIcon.tintColor = self.underlineColor
-                self.underLine.backgroundColor = self.underlineColor
-            }
+            setAnimation(
+                cleanIconAlpha: 0,
+                alertLabelText: "",
+                infoIconAlpha: 0,
+                backViewBorderColor: UIColor.systemGray,
+                placeHolderTextColor: .systemGray,
+                infoIconColor: .systemGray,
+                cleanIconWidth: 1,
+                infoIconWidth: 1,
+                placeholderAlpha: 1,
+                underlineColor: self.underlineColor,
+                leftIconColor: self.underlineColor
+            )
         }
     }
     
     
     private func setupContains(){
-        if let text = self.textField.text, !text.contains("@") || !text.contains(".") {
-            UIView.animate(withDuration: 0.2) {
-                self.infoIconWidthConstraint.constant = 20
-                self.infoIcon.alpha = 1
-                self.layoutIfNeeded()
-                self.backView.layer.borderColor = UIColor.systemRed.cgColor
-                self.infoIcon.tintColor = .systemRed
-                self.alertLabel.textColor = .systemRed
-                self.alertLabel.text = self.alertMessage
-                self.leftIcon.tintColor = .systemRed
-                self.underLine.backgroundColor = .systemRed
-            }
+        if isValidFunc() {
+            setAnimation(
+                alertLabelText: self.validMessage,
+                alertLabelTextColor: .systemGreen,
+                infoIconAlpha: 0,
+                infoIconColor: .systemGray,
+                infoIconWidth: 1,
+                underlineColor: self.underlineColor,
+                leftIconColor: self.underlineColor
+            )
         } else {
-            UIView.animate(withDuration: 0.2) {
-                self.infoIcon.tintColor = .systemGray
-                self.infoIcon.alpha = 0
-                self.infoIconWidthConstraint.constant = 1
-                self.layoutIfNeeded()
-                self.alertLabel.textColor = .systemGreen
-                self.alertLabel.text = self.validMessage
-                self.leftIcon.tintColor = self.underlineColor
-                self.underLine.backgroundColor = self.underlineColor
-            }
+            setAnimation(
+                alertLabelText: self.alertMessage,
+                alertLabelTextColor: .systemRed,
+                infoIconAlpha: 1,
+                backViewBorderColor: UIColor.systemRed,
+                infoIconColor: .systemRed,
+                infoIconWidth: 20,
+                underlineColor: .systemRed,
+                leftIconColor: .systemRed
+            )
         }
         
     }
@@ -260,6 +280,57 @@ public class BYUnderlineTextField: UIView {
             self.alertLabel.text = ""
         }
         textFieldDidChange()
+    }
+    
+    // MARK: ANIMATION FUNC
+    
+    private func setAnimation(transform: CGAffineTransform? = nil, txtFieldTransform: CGAffineTransform? = nil, cleanIconAlpha: CGFloat? = nil, alertLabelText: String? = nil, alertLabelTextColor: UIColor? = nil, infoIconAlpha: CGFloat? = nil, backViewBorderColor: UIColor? = nil, placeHolderTextColor: UIColor? = nil, infoIconColor: UIColor? = nil, cleanIconWidth: CGFloat? = nil, infoIconWidth: CGFloat? = nil, placeholderAlpha: CGFloat? = nil, underlineColor: UIColor? = nil, leftIconColor: UIColor? = nil) {
+        
+        UIView.animate(withDuration: 0.2 ) {
+            if let transform = transform {
+                self.placeholderLabel.transform = transform
+            }
+            if let txtFieldTransform = txtFieldTransform {
+                self.textField.transform = txtFieldTransform
+            }
+            if let cleanIconAlpha = cleanIconAlpha {
+                self.cleanIcon.alpha = cleanIconAlpha
+            }
+            if let alertLabelText = alertLabelText {
+                self.alertLabel.text = alertLabelText
+            }
+            if let alertLabelTextColor = alertLabelTextColor {
+                self.alertLabel.textColor = alertLabelTextColor
+            }
+            if let infoIconAlpha = infoIconAlpha {
+                self.infoIcon.alpha = infoIconAlpha
+            }
+            if let backViewBorderColor = backViewBorderColor {
+                self.backView.layer.borderColor = backViewBorderColor.cgColor
+            }
+            if let placeHolderTextColor = placeHolderTextColor {
+                self.placeholderLabel.textColor = placeHolderTextColor
+            }
+            if let infoIconColor = infoIconColor {
+                self.infoIcon.tintColor = infoIconColor
+            }
+            if let cleanIconWidth = cleanIconWidth {
+                self.cleanIconWidthConstraint.constant = cleanIconWidth
+            }
+            if let infoIconWidth = infoIconWidth {
+                self.infoIconWidthConstraint.constant = infoIconWidth
+            }
+            if let placeholderAlpha = placeholderAlpha {
+                self.placeholderLabel.alpha = placeholderAlpha
+            }
+            if let underlineColor = underlineColor {
+                self.underLine.backgroundColor = underlineColor
+            }
+            if let leftIconColor = leftIconColor {
+                self.leftIcon.tintColor = leftIconColor
+            }
+            self.layoutIfNeeded()
+        }
     }
     
 }

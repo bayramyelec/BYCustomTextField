@@ -9,6 +9,12 @@ import UIKit
 
 public class BYSecurityTextField: UIView {
     
+    // MARK: VARIABLES
+    
+    public var text: String? {
+        return textField.text
+    }
+    
     private var placeholder: String?
     private var alertMessage: String?
     private var validMessage: String?
@@ -24,6 +30,8 @@ public class BYSecurityTextField: UIView {
             textField.textColor = textColor
         }
     }
+    
+    // MARK: COMPONENTS
     
     private var backView: UIView = {
         let view = UIView()
@@ -77,14 +85,28 @@ public class BYSecurityTextField: UIView {
         return label
     }()
     
+    // MARK: ICON WIDTH
+    
     private var cleanIconWidthConstraint: NSLayoutConstraint!
     
     private var isSecure: Bool = true
     
-    public init(placeHolder: String?, alertMessage: String?, validMessage: String?){
+    // MARK: IS VALID
+    
+    private var minCharacterCount: Int
+    
+    private func isValidFunc() -> Bool {
+        guard let text = textField.text else { return false }
+        return  text.count >= minCharacterCount
+    }
+    
+    // MARK: INIT
+    
+    public init(placeHolder: String?, alertMessage: String?, validMessage: String?, minCharacterCount: Int){
         self.placeholder = placeHolder
         self.alertMessage = alertMessage
         self.validMessage = validMessage
+        self.minCharacterCount = minCharacterCount
         super.init(frame: .zero)
         setupUI()
         configure()
@@ -99,6 +121,8 @@ public class BYSecurityTextField: UIView {
     public override var intrinsicContentSize: CGSize {
         return CGSizeMake(UIView.noIntrinsicMetric, 70)
     }
+    
+    // MARK: FUNCTIONS
     
     private func setupUI() {
         addSubview(backView)
@@ -163,49 +187,43 @@ public class BYSecurityTextField: UIView {
     
     private func textFieldChange(){
         if let text = textField.text, !text.isEmpty {
-            UIView.animate(withDuration: 0.1) {
-                self.placeholderLabel.transform = CGAffineTransform(translationX: -55, y: -20)
-                    .concatenating(CGAffineTransform(scaleX: 0.7, y: 0.7))
-                self.textField.transform = CGAffineTransform(translationX: 0, y: 5)
-            }
-            UIView.animate(withDuration: 0.2) {
-                self.cleanIconWidthConstraint.constant = 20
-                self.cleanIcon.alpha = 1
-                self.layoutIfNeeded()
-            }
+            setAnimation(
+                transform: CGAffineTransform(translationX: -55, y: -20)
+                    .concatenating(CGAffineTransform(scaleX: 0.7, y: 0.7)),
+                txtFieldTransform: CGAffineTransform(translationX: 0, y: 5),
+                cleanIconWidth: 20,
+                cleanIconAlpha: 1
+            )
             setupContains()
         } else {
-            UIView.animate(withDuration: 0.2) {
-                self.placeholderLabel.transform = .identity
-                self.textField.transform = .identity
-                self.alertLabel.text = ""
-                self.cleanIcon.alpha = 0
-                self.cleanIconWidthConstraint.constant = 1
-                self.layoutIfNeeded()
-                self.backView.layer.borderColor = UIColor.systemGray.cgColor
-                self.placeholderLabel.textColor = .systemGray
-            }
+            setAnimation(
+                transform: .identity,
+                txtFieldTransform: .identity,
+                cleanIconWidth: 1,
+                cleanIconAlpha: 0,
+                alertLabelText: "",
+                backViewBorderColor: UIColor.systemGray,
+                placeHolderTextColor: UIColor.systemGray
+            )
         }
     }
     
     
     private func setupContains(){
-        if let text = self.textField.text, text.count < 6 {
-            UIView.animate(withDuration: 0.2) {
-                self.layoutIfNeeded()
-                self.backView.layer.borderColor = UIColor.systemRed.cgColor
-                self.placeholderLabel.textColor = .systemRed
-                self.alertLabel.textColor = .systemRed
-                self.alertLabel.text = self.alertMessage
-            }
+        if isValidFunc() {
+            setAnimation(
+                alertLabelText: self.validMessage,
+                alertLabelTextColor: .systemGreen,
+                backViewBorderColor: UIColor.systemGray,
+                placeHolderTextColor: .systemGray
+            )
         } else {
-            UIView.animate(withDuration: 0.2) {
-                self.backView.layer.borderColor = UIColor.systemGray.cgColor
-                self.placeholderLabel.textColor = .systemGray
-                self.alertLabel.text = self.validMessage
-                self.alertLabel.textColor = .systemGreen
-                self.layoutIfNeeded()
-            }
+            setAnimation(
+                alertLabelText: self.alertMessage,
+                alertLabelTextColor: .systemRed,
+                backViewBorderColor: UIColor.systemRed,
+                placeHolderTextColor: .systemRed
+            )
         }
         
     }
@@ -227,6 +245,40 @@ public class BYSecurityTextField: UIView {
             self.textField.isSecureTextEntry = false
             self.securityIcon.setImage(UIImage(systemName: "eye.fill"), for: .normal)
         }
+    }
+    
+    // MARK: ANIMATION FUNC
+    
+    private func setAnimation(transform: CGAffineTransform? = nil, txtFieldTransform: CGAffineTransform? = nil, cleanIconWidth: CGFloat? = nil, cleanIconAlpha: CGFloat? = nil, alertLabelText: String? = nil, alertLabelTextColor: UIColor? = nil, backViewBorderColor: UIColor? = nil, placeHolderTextColor: UIColor? = nil, infoIconColor: UIColor? = nil, infoIconWidth: CGFloat? = nil) {
+        
+        UIView.animate(withDuration: 0.2 ) {
+            if let transform = transform {
+                self.placeholderLabel.transform = transform
+            }
+            if let txtFieldTransform = txtFieldTransform {
+                self.textField.transform = txtFieldTransform
+            }
+            if let cleanIconAlpha = cleanIconAlpha {
+                self.cleanIcon.alpha = cleanIconAlpha
+            }
+            if let alertLabelText = alertLabelText {
+                self.alertLabel.text = alertLabelText
+            }
+            if let alertLabelTextColor = alertLabelTextColor {
+                self.alertLabel.textColor = alertLabelTextColor
+            }
+            if let backViewBorderColor = backViewBorderColor {
+                self.backView.layer.borderColor = backViewBorderColor.cgColor
+            }
+            if let placeHolderTextColor = placeHolderTextColor {
+                self.placeholderLabel.textColor = placeHolderTextColor
+            }
+            if let cleanIconWidth = cleanIconWidth {
+                self.cleanIconWidthConstraint.constant = cleanIconWidth
+            }
+            self.layoutIfNeeded()
+        }
+        
     }
     
 }
