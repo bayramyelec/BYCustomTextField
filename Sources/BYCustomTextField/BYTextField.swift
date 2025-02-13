@@ -21,15 +21,11 @@ public class BYTextField: UIView {
     
     
     public var backColor : UIColor? {
-        
         return backView.backgroundColor
-        
     }
     
     public var textColor : UIColor? {
-        
         return textField.textColor
-        
     }
     
     // MARK: COMPONENT
