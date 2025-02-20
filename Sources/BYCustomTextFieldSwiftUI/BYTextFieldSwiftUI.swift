@@ -9,7 +9,7 @@ import SwiftUI
 
 struct BYTextField: View {
     
-    @State private var text: String = ""
+    @Binding var text: String
     let placeholder: String
     var alertText: String
     var validText: String
