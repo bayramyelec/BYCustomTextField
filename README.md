@@ -148,7 +148,6 @@ BYCustomTextField is a customizable text input component developed using Swift a
             customTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             customTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
             customTextField.widthAnchor.constraint(equalToConstant: 250),
-            customTextField.heightAnchor.constraint(equalToConstant: 70)
         ])
     }
     
