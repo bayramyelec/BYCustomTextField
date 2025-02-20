@@ -10,6 +10,9 @@ let package = Package(
         .library(
             name: "BYCustomTextField",
             targets: ["BYCustomTextField"]),
+        .library(
+            name: "BYCustomTextFieldSwiftUI",
+            targets: ["BYCustomTextFieldSwiftUI"]),
     ],
     dependencies: [],
     targets: [
@@ -17,6 +20,9 @@ let package = Package(
             name: "BYCustomTextField",
             dependencies: []
         ),
-
+        .target(
+            name: "BYCustomTextFieldSwiftUI",
+            dependencies: []
+        ),
     ]
 )
