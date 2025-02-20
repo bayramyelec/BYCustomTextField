@@ -7,7 +7,9 @@
 
 import UIKit
 
-public class BYSecurityTextField: UIView {
+public class BYSecurityTextField: UIView, UITextFieldDelegate {
+    
+    public weak var delegate: UITextFieldDelegate?
     
     // MARK: VARIABLES
     
@@ -112,6 +114,7 @@ public class BYSecurityTextField: UIView {
         configure()
         placeholderLabel.text = placeHolder
         alertLabel.text = ""
+        textField.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -281,4 +284,33 @@ public class BYSecurityTextField: UIView {
         
     }
     
+}
+
+extension BYSecurityTextField {
+    
+    // MARK: - UITextFieldDelegate Methods
+        
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+            return delegate?.textFieldShouldBeginEditing?(textField) ?? true
+        }
+
+    public func textFieldDidBeginEditing(_ textField: UITextField) {
+            delegate?.textFieldDidBeginEditing?(textField)
+        }
+
+    public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+            return delegate?.textFieldShouldEndEditing?(textField) ?? true
+        }
+
+    public func textFieldDidEndEditing(_ textField: UITextField) {
+            delegate?.textFieldDidEndEditing?(textField)
+        }
+
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+            return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
+        }
+
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            return delegate?.textFieldShouldReturn?(textField) ?? true
+        }
 }

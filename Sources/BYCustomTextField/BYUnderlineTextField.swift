@@ -7,7 +7,9 @@
 
 import UIKit
 
-public class BYUnderlineTextField: UIView {
+public class BYUnderlineTextField: UIView, UITextFieldDelegate {
+    
+    public weak var delegate: UITextFieldDelegate?
     
     // MARK: VARIABLES
     
@@ -134,6 +136,7 @@ public class BYUnderlineTextField: UIView {
         alertLabel.text = ""
         underLine.backgroundColor = underlineColor
         self.leftIcon.tintColor = underlineColor
+        textField.delegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -333,4 +336,33 @@ public class BYUnderlineTextField: UIView {
         }
     }
     
+}
+
+extension BYUnderlineTextField {
+    
+    // MARK: - UITextFieldDelegate Methods
+        
+    public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
+            return delegate?.textFieldShouldBeginEditing?(textField) ?? true
+        }
+
+    public func textFieldDidBeginEditing(_ textField: UITextField) {
+            delegate?.textFieldDidBeginEditing?(textField)
+        }
+
+    public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
+            return delegate?.textFieldShouldEndEditing?(textField) ?? true
+        }
+
+    public func textFieldDidEndEditing(_ textField: UITextField) {
+            delegate?.textFieldDidEndEditing?(textField)
+        }
+
+    public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+            return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
+        }
+
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+            return delegate?.textFieldShouldReturn?(textField) ?? true
+        }
 }
