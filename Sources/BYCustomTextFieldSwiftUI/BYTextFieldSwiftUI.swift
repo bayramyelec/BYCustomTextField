@@ -23,6 +23,18 @@ public struct BYTextFieldSwiftUI: View {
         return characters.allSatisfy { text.contains($0) }
     }
     
+    
+    
+    public init(text: Binding<String>, placeholder: String, alertText: String, validText: String, characters: [String], backColor: Color, textColor: Color) {
+        self._text = text
+        self.placeholder = placeholder
+        self.alertText = alertText
+        self.validText = validText
+        self.characters = characters
+        self.backColor = backColor
+        self.textColor = textColor
+    }
+    
     public var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             ZStack(alignment: .leading) {
