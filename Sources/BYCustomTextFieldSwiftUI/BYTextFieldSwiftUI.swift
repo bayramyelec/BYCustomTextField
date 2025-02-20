@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct BYTextField: View {
+struct BYTextFieldSwiftUI: View {
     
     @Binding var text: String
     let placeholder: String
@@ -88,7 +88,3 @@ struct BYTextField: View {
     }
 }
 
-
-#Preview {
-    BYTextField(placeholder: "dsda", alertText: "sfsadf", validText: "asdfsadf", characters: [], backColor: .accentColor, textColor: .black)
-}
