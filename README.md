@@ -130,6 +130,43 @@ BYCustomTextField is a customizable text input component developed using Swift a
 | `textColor`      | `UIColor?` | **Text color of the text field.**. |
 | `minCharacterCount`      | `Int?` | **Minimum number of characters.**. |
 
+# Delegate Methods
+
+```swift
+    class ViewController: UIViewController, UITextFieldDelegate {
+    
+    let customTextField = BYTextField(placeholder: "E-mail", alertMessage: "Lütfen geçerli bir e-mail adresi girin.", validMessage: "Geçerli e-mail adresi.", characters: ["@", "."])
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        view.addSubview(customTextField)
+        customTextField.delegate = self
+        
+        customTextField.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            customTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            customTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            customTextField.widthAnchor.constraint(equalToConstant: 250),
+        ])
+    }
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        print("Kullanıcı giriş yapmaya başladı")
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        print("Kullanıcı giriş yapmayı bitirdi")
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
+    }
+}
+
+```
+
 # LICENSE
 
 ---
