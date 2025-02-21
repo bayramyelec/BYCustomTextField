@@ -21,6 +21,10 @@ BYCustomTextField is a customizable text input component developed using Swift a
     https://github.com/bayramyelec/BYCustomTextField
 ```
 
+<img width="800" alt="Ekran Resmi 2025-02-21 13 55 11" src="https://github.com/user-attachments/assets/ef2e9a58-c0c2-4fdd-9556-88c5a08c2884" />
+<img width="800" alt="Ekran Resmi 2025-02-21 13 55 25" src="https://github.com/user-attachments/assets/396c0e6e-a576-40b5-80e1-41857ebb620f" />
+
+
 # Usage
 
 ### BYTextField
@@ -36,6 +40,18 @@ BYCustomTextField is a customizable text input component developed using Swift a
         emailTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         emailTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
    ])
+```
+
+### BYTextFieldSwiftUI
+
+```swift
+    import BYCustomTextFieldSwiftUI
+            .
+            .
+    @State var text: String = ""
+            .
+            .
+    BYTextFieldSwiftUI(text: $text, placeholder: "E-mail", alertText: "Lütfen geçerli bir email girin.", validText: "Geçerli email.", characters: ["@","."], backColor: Color.gray.opacity(0.2), textColor: Color.black)
 ```
 
 ---
@@ -65,6 +81,18 @@ BYCustomTextField is a customizable text input component developed using Swift a
    ])
 ```
 
+### BYSecurityTextFieldSwiftUI
+
+```swift
+    import BYCustomTextFieldSwiftUI
+            .
+            .
+    @State var text: String = ""
+            .
+            .
+    BYSecurityTextFieldSwiftUI(text: $text, placeholder: "Password", alertText: "Şifreniz en az 5 haneli olmak zorunda.", validText: "Geçerli şifre.", characterCount: 5, backColor: Color.gray.opacity(0.2), textColor: Color.black)
+```
+
 ---
 
 | Parameter | Type     | Description                       |
@@ -91,6 +119,18 @@ BYCustomTextField is a customizable text input component developed using Swift a
    ])
 ```
 
+### BYUnderlineTextFieldSwiftUI
+
+```swift
+    import BYCustomTextFieldSwiftUI
+            .
+            .
+    @State var text: String = ""
+            .
+            .
+    BYUnderlineTextFieldSwiftUI(text: $text, placeholder: "E-mail", alertText: "Lütfen geçerli bir email girin.", validText: "Geçerli email.", characters: ["@","."], backColor: Color.gray.opacity(0.0), textColor: Color.black, underLineColor: Color.gray, leftIcon: "person.fill")
+```
+
 | Parameter | Type     | Description                       |
 | :-------- | :------- | :-------------------------------- |
 | `leftIcon`      | `UIImage` | **Textfield left icon.**. |
@@ -115,6 +155,18 @@ BYCustomTextField is a customizable text input component developed using Swift a
         passwordUnderlineTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         passwordUnderlineTextField.centerYAnchor.constraint(equalTo: view.centerYAnchor)
    ])
+```
+
+### BYUnderlineSecurityTextFieldSwiftUI
+
+```swift
+    import BYCustomTextFieldSwiftUI
+            .
+            .
+    @State var text: String = ""
+            .
+            .
+    BYUnderlineSecurityTextFieldSwiftUI(text: $text, placeholder: "Password", alertText: "Şifreniz en az 5 haneli olmak zorunda.", validText: "Geçerli şifre.", minCharacterCount: 5, backColor: Color.gray.opacity(0.0), textColor: Color.black, underLineColor: Color.gray, leftIcon: "lock.fill")
 ```
 
 ---
