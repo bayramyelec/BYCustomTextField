@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 public struct BYSecurityTextFieldSwiftUI: View {
     
@@ -18,13 +19,18 @@ public struct BYSecurityTextFieldSwiftUI: View {
     var backColor: Color
     var textColor: Color
     
+    var leftIcon: String
+    var leftIconColor: Color
+    
     func isValid() -> Bool {
         return text.count >= minCharacterCount
     }
     
     @State private var isToggle: Bool = false
     
-    public init(text: Binding<String>, placeholder: String, alertText: String, validText: String, characterCount: Int, backColor: Color, textColor: Color) {
+    @State private var displayValidText: String = ""
+    
+    public init(text: Binding<String>, placeholder: String, alertText: String = "", validText: String = "", characterCount: Int = 0, backColor: Color = Color.gray.opacity(0.2), textColor: Color = Color.black, leftIcon: String = "", leftIconColor: Color = .gray) {
         self._text = text
         self.placeholder = placeholder
         self.alertText = alertText
@@ -32,6 +38,8 @@ public struct BYSecurityTextFieldSwiftUI: View {
         self.minCharacterCount = characterCount
         self.backColor = backColor
         self.textColor = textColor
+        self.leftIcon = leftIcon
+        self.leftIconColor = leftIconColor
     }
     
     public var body: some View {
@@ -49,22 +57,38 @@ public struct BYSecurityTextFieldSwiftUI: View {
                 
                 HStack {
                     
+                    Image(systemName: leftIcon)
+                        .foregroundStyle(leftIconColor)
+                        .padding(.leading, 10)
+                    
                     if isToggle {
                         TextField("", text: $text)
-                            .padding(.leading)
+                            .padding(.leading, 5)
                             .font(.system(size: 15, weight: .bold))
                             .frame(height: 40)
                             .cornerRadius(10)
                             .offset(y: text.isEmpty ? 0 : 5)
                             .foregroundStyle(textColor)
+                            .onReceive(Just(text)) { _ in
+                                if !isValid() {
+                                    let generator = UIImpactFeedbackGenerator(style: .heavy)
+                                    generator.impactOccurred()
+                                }
+                            }
                     } else {
                         SecureField("", text: $text)
-                            .padding(.leading)
+                            .padding(.leading, 5)
                             .font(.system(size: 15, weight: .bold))
                             .frame(height: 40)
                             .cornerRadius(10)
                             .offset(y: text.isEmpty ? 0 : 5)
                             .foregroundStyle(textColor)
+                            .onReceive(Just(text)) { _ in
+                                if !isValid() {
+                                    let generator = UIImpactFeedbackGenerator(style: .heavy)
+                                    generator.impactOccurred()
+                                }
+                            }
                     }
                     
                     Spacer()
@@ -91,21 +115,28 @@ public struct BYSecurityTextFieldSwiftUI: View {
                 .animation(.easeInOut(duration: 0.2), value: text.isEmpty)
                 
                 Text(placeholder)
-                    .padding(.horizontal, 15)
+                    .padding(.horizontal, leftIcon.isEmpty ? 25 : 40)
                     .font(.system(size: text.isEmpty ? 15 : 10, weight: .bold))
                     .foregroundColor(isValid() || text.isEmpty ? Color.gray : Color.red)
                     .offset(y: text.isEmpty ? 0 : -15)
                     .animation(.easeInOut(duration: 0.2), value: text.isEmpty)
             }
             
-            Text(isValid() ? validText : alertText)
+            Text(displayValidText.isEmpty ? (isValid() ? "" : alertText) : displayValidText)
                 .foregroundColor(isValid() ? Color.green : Color.red)
                 .font(.system(size: 13, weight: .medium))
                 .frame(height: 20)
                 .padding(.top, 2)
                 .opacity(text.isEmpty ? 0 : 1)
                 .animation(.easeInOut(duration: 0.2), value: text.isEmpty)
-                .animation(.easeInOut(duration: 0.2), value: isValid())
+                .onChange(of: isValid()) { valid in
+                    if valid {
+                        displayValidText = validText
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            displayValidText = ""
+                        }
+                    }
+                }
             
         }
     }

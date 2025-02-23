@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 public struct BYTextFieldSwiftUI: View {
     
@@ -13,17 +14,22 @@ public struct BYTextFieldSwiftUI: View {
     let placeholder: String
     var alertText: String
     var validText: String
-    let characters: [String]
+    var characters: [String]
     
     var backColor: Color
     var textColor: Color
+    
+    var leftIcon: String
+    var leftIconColor: Color
     
     func isValid() -> Bool {
         guard !characters.isEmpty else { return true }
         return characters.allSatisfy { text.contains($0) }
     }
     
-    public init(text: Binding<String>, placeholder: String, alertText: String, validText: String, characters: [String], backColor: Color, textColor: Color) {
+    @State private var displayValidText: String = ""
+    
+    public init(text: Binding<String>, placeholder: String, alertText: String = "", validText: String = "", characters: [String] = [], backColor: Color = .gray.opacity(0.2), textColor: Color = .black, leftIcon: String = "", leftIconColor: Color = .gray) {
         self._text = text
         self.placeholder = placeholder
         self.alertText = alertText
@@ -31,6 +37,8 @@ public struct BYTextFieldSwiftUI: View {
         self.characters = characters
         self.backColor = backColor
         self.textColor = textColor
+        self.leftIcon = leftIcon
+        self.leftIconColor = leftIconColor
     }
     
     public var body: some View {
@@ -47,13 +55,23 @@ public struct BYTextFieldSwiftUI: View {
                     .animation(.easeInOut(duration: 0.2), value: text.isEmpty)
                 
                 HStack {
+                    Image(systemName: leftIcon)
+                        .foregroundStyle(leftIconColor)
+                        .padding(.leading, 10)
+                    
                     TextField("", text: $text)
-                        .padding(.leading)
+                        .padding(.leading, 5)
                         .font(.system(size: 15, weight: .bold))
                         .frame(height: 40)
                         .cornerRadius(10)
                         .offset(y: text.isEmpty ? 0 : 5)
                         .foregroundStyle(textColor)
+                        .onReceive(Just(text)) { _ in
+                            if !isValid() {
+                                let generator = UIImpactFeedbackGenerator(style: .heavy)
+                                generator.impactOccurred()
+                            }
+                        }
                     
                     Spacer()
                     
@@ -81,7 +99,7 @@ public struct BYTextFieldSwiftUI: View {
                 .animation(.easeInOut(duration: 0.2), value: text.isEmpty)
                 
                 Text(placeholder)
-                    .padding(.horizontal, 15)
+                    .padding(.horizontal, leftIcon.isEmpty ? 25 : 40)
                     .font(.system(size: text.isEmpty ? 15 : 10, weight: .bold))
                     .foregroundColor(isValid() || text.isEmpty ? Color.gray : Color.red)
                     .offset(y: text.isEmpty ? 0 : -15)
@@ -89,16 +107,22 @@ public struct BYTextFieldSwiftUI: View {
             }
             
             if !characters.isEmpty {
-                Text(isValid() ? validText : alertText)
+                Text(displayValidText.isEmpty ? (isValid() ? "" : alertText) : displayValidText)
                     .foregroundColor(isValid() ? Color.green : Color.red)
                     .font(.system(size: 13, weight: .medium))
                     .frame(height: 20)
                     .padding(.top, 2)
                     .opacity(text.isEmpty ? 0 : 1)
                     .animation(.easeInOut(duration: 0.2), value: text.isEmpty)
-                    .animation(.easeInOut(duration: 0.2), value: isValid())
+                    .onChange(of: isValid()) { valid in
+                        if valid {
+                            displayValidText = validText
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                displayValidText = ""
+                            }
+                        }
+                    }
             }
         }
     }
 }
-
