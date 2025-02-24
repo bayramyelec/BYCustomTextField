@@ -36,6 +36,9 @@ BYCustomTextField is a customizable text input component developed using Swift a
 <a><img src="https://github.com/user-attachments/assets/625ed57b-5ee8-40cc-9da8-d9c919e246fe" width="200" /></a>
 
 ```swift
+import BYCustomTextField
+        .
+        .
     let emailTextField = BYTextField(placeholder: "E-mail", alertMessage: "Lütfen geçerli bir e-mail adresi girin.", validMessage: "Geçerli e-mail adresi.", characters: ["@", "."])
     emailTextField.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(emailTextField)
@@ -77,6 +80,9 @@ BYCustomTextField is a customizable text input component developed using Swift a
 <a><img src="https://github.com/user-attachments/assets/c6613800-7793-4612-bc18-610bb0925949" width="200" /></a>
 
 ```swift
+import BYCustomTextField
+        .
+        .
     let passwordTextField = BYSecurityTextField(placeHolder: "Password", alertMessage: "Şifreniz en az 6  haneli olmalı.", validMessage: "Geçerli şifre.", minCharacterCount: 6)
     passwordTextField.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(passwordTextField)
@@ -117,6 +123,9 @@ BYCustomTextField is a customizable text input component developed using Swift a
 <a><img src="https://github.com/user-attachments/assets/32642be9-bc83-42a8-ac0d-3851be413f91" width="200" /></a>
 
 ```swift
+import BYCustomTextField
+        .
+        .
     let emailUnderlineTextField = BYUnderlineTextField(leftIcon: UIImage(systemName: "person.fill") ?? UIImage(), placeholder: "E-mail", alertMessage: "Lütfen geçerli bir e-mail adresi girin.", validMessage: "Geçerli e-mail adresi.", underlineColor: .black, characters: ["@", "."])
     emailUnderlineTextField.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(emailUnderlineTextField)
@@ -156,6 +165,9 @@ BYCustomTextField is a customizable text input component developed using Swift a
 <a><img src="https://github.com/user-attachments/assets/031aff7a-5f42-48fb-a429-d0cde4352491" width="200" /></a>
 
 ```swift
+import BYCustomTextField
+        .
+        .
     let passwordUnderlineTextField = BYUnderlineSecurityTextField(leftIcon: UIImage(systemName: "key.horizontal.fill") ?? UIImage(), placeholder: "Password", alertMessage: "Şifreniz en az 6  haneli olmalı.", validMessage: "Geçerli şifre.", underlineColor: .black, minCharacterCount: 6)
     passwordUnderlineTextField.translatesAutoresizingMaskIntoConstraints = false
     view.addSubview(passwordUnderlineTextField)
