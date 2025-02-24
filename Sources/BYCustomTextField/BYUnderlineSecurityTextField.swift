@@ -21,18 +21,6 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
     private var alertMessage: String?
     private var validMessage: String?
     
-    public var backColor : UIColor? {
-        didSet {
-            backView.backgroundColor = backColor
-        }
-    }
-    
-    public var textColor : UIColor? {
-        didSet {
-            textField.textColor = textColor
-        }
-    }
-    
     public var underlineColor : UIColor? {
         didSet {
             underLine.backgroundColor = underlineColor
@@ -106,6 +94,7 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
     // MARK: ICON WIDTH
     
     private var cleanIconWidthConstraint: NSLayoutConstraint!
+    private var leftIconWidthConstraint: NSLayoutConstraint!
     
     private var isSecure: Bool = true
     
@@ -118,22 +107,26 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
         return  text.count >= minCharacterCount
     }
     
+    private var leftIconString: String = ""
+    
     // MARK: INIT
     
-    public init(leftIcon: UIImage, placeholder: String, alertMessage: String, validMessage: String, underlineColor: UIColor, minCharacterCount: Int) {
+    public init(placeholder: String, alertMessage: String = "", validMessage: String = "", underlineColor: UIColor = .systemGray, minCharacterCount: Int = 0, textColor: UIColor = .black , leftIcon: String = "") {
         self.placeholder = placeholder
         self.alertMessage = alertMessage
         self.validMessage = validMessage
         self.underlineColor = underlineColor
-        self.leftIcon.image = leftIcon
         self.minCharacterCount = minCharacterCount
+        self.textField.textColor = textColor
+        self.leftIconString = leftIcon
+        self.leftIcon.image = UIImage(systemName: self.leftIconString)
+        self.leftIcon.tintColor = underlineColor
         super.init(frame: .zero)
         setupUI()
         configure()
         placeholderLabel.text = placeholder
         alertLabel.text = ""
         underLine.backgroundColor = underlineColor
-        self.leftIcon.tintColor = underlineColor
         textField.delegate = self
     }
     
@@ -191,16 +184,17 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
         ])
         
         backView.addSubview(leftIcon)
+        leftIconWidthConstraint = leftIcon.widthAnchor.constraint(equalToConstant: self.leftIconString.isEmpty ? 0 : 20)
         NSLayoutConstraint.activate([
             leftIcon.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -14),
             leftIcon.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 10),
-            leftIcon.widthAnchor.constraint(equalToConstant: 20)
+            leftIconWidthConstraint
         ])
         
         backView.addSubview(textField)
         NSLayoutConstraint.activate([
             textField.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
-            textField.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
+            textField.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
             textField.leftAnchor.constraint(equalTo: leftIcon.rightAnchor, constant: 10),
             textField.rightAnchor.constraint(equalTo: securityIcon.leftAnchor, constant: -10)
         ])
@@ -208,7 +202,7 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
         backView.addSubview(placeholderLabel)
         NSLayoutConstraint.activate([
             placeholderLabel.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
-            placeholderLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
+            placeholderLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
             placeholderLabel.leftAnchor.constraint(equalTo: leftIcon.rightAnchor, constant: 10),
             placeholderLabel.rightAnchor.constraint(equalTo: securityIcon.leftAnchor, constant: -10)
         ])
@@ -231,6 +225,9 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
                 placeholderAlpha: 0
             )
             setupContains()
+            if minCharacterCount == 0 {
+                self.alertLabel.alpha = 0
+            }
         } else {
             setAnimation(
                 txtFieldTransform: .identity,
@@ -256,6 +253,11 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
                 leftIconColor: self.underlineColor
             )
         } else {
+            
+            // hata için titreşim
+            
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
+            generator.impactOccurred()
             setAnimation(
                 alertLabelText: self.alertMessage,
                 alertLabelTextColor: .systemRed,
@@ -333,28 +335,28 @@ public class BYUnderlineSecurityTextField: UIView, UITextFieldDelegate {
 extension BYUnderlineSecurityTextField {
     
     // MARK: - UITextFieldDelegate Methods
-        
+    
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldBeginEditing?(textField) ?? true
-        }
-
+        return delegate?.textFieldShouldBeginEditing?(textField) ?? true
+    }
+    
     public func textFieldDidBeginEditing(_ textField: UITextField) {
-            delegate?.textFieldDidBeginEditing?(textField)
-        }
-
+        delegate?.textFieldDidBeginEditing?(textField)
+    }
+    
     public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldEndEditing?(textField) ?? true
-        }
-
+        return delegate?.textFieldShouldEndEditing?(textField) ?? true
+    }
+    
     public func textFieldDidEndEditing(_ textField: UITextField) {
-            delegate?.textFieldDidEndEditing?(textField)
-        }
-
+        delegate?.textFieldDidEndEditing?(textField)
+    }
+    
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
-        }
-
+        return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
+    }
+    
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldReturn?(textField) ?? true
-        }
+        return delegate?.textFieldShouldReturn?(textField) ?? true
+    }
 }

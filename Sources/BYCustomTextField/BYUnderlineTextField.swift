@@ -21,18 +21,6 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
         return textField.text
     }
     
-    public var backColor : UIColor? {
-        didSet {
-            backView.backgroundColor = backColor
-        }
-    }
-    
-    public var textColor : UIColor? {
-        didSet {
-            textField.textColor = textColor
-        }
-    }
-    
     public var underlineColor : UIColor? {
         didSet {
             underLine.backgroundColor = underlineColor
@@ -120,15 +108,21 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
         return characters.allSatisfy { text.contains($0) }
     }
     
+    private var leftIconWidthConstraint: NSLayoutConstraint!
+    private var leftIconString: String = ""
+    
     // MARK: INIT
     
-    public init(leftIcon: UIImage, placeholder: String, alertMessage: String, validMessage: String, underlineColor: UIColor, characters: [String]) {
+    public init(placeholder: String, alertMessage: String = "", validMessage: String = "", underlineColor: UIColor = .systemGray, characters: [String] = [], textColor: UIColor = .black , leftIcon: String = "") {
         self.placeHolderText = placeholder
         self.alertMessage = alertMessage
         self.validMessage = validMessage
         self.underlineColor = underlineColor
-        self.leftIcon.image = leftIcon
         self.characters = characters
+        self.leftIconString = leftIcon
+        self.leftIcon.image = UIImage(systemName: self.leftIconString)
+        self.leftIcon.tintColor = underlineColor
+        self.textField.textColor = textColor
         super.init(frame: .zero)
         setupUI()
         configure()
@@ -193,16 +187,17 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
         ])
         
         backView.addSubview(leftIcon)
+        leftIconWidthConstraint = leftIcon.widthAnchor.constraint(equalToConstant: self.leftIconString.isEmpty ? 0 : 20)
         NSLayoutConstraint.activate([
             leftIcon.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -14),
             leftIcon.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 10),
-            leftIcon.widthAnchor.constraint(equalToConstant: 20)
+            leftIconWidthConstraint
         ])
         
         backView.addSubview(textField)
         NSLayoutConstraint.activate([
             textField.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
-            textField.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
+            textField.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
             textField.leftAnchor.constraint(equalTo: leftIcon.rightAnchor, constant: 10),
             textField.rightAnchor.constraint(equalTo: infoIcon.leftAnchor, constant: -10)
         ])
@@ -210,7 +205,7 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
         backView.addSubview(placeholderLabel)
         NSLayoutConstraint.activate([
             placeholderLabel.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
-            placeholderLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor),
+            placeholderLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
             placeholderLabel.leftAnchor.constraint(equalTo: leftIcon.rightAnchor, constant: 10),
             placeholderLabel.rightAnchor.constraint(equalTo: infoIcon.leftAnchor, constant: -10)
         ])
@@ -233,6 +228,9 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
                 placeholderAlpha: 0
             )
             setupContains()
+            if characters.isEmpty {
+                self.alertLabel.alpha = 0
+            }
         } else {
             setAnimation(
                 cleanIconAlpha: 0,
@@ -263,6 +261,11 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
                 leftIconColor: self.underlineColor
             )
         } else {
+            
+            // hata için titreşim
+            
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
+            generator.impactOccurred()
             setAnimation(
                 alertLabelText: self.alertMessage,
                 alertLabelTextColor: .systemRed,
@@ -341,28 +344,28 @@ public class BYUnderlineTextField: UIView, UITextFieldDelegate {
 extension BYUnderlineTextField {
     
     // MARK: - UITextFieldDelegate Methods
-        
+    
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldBeginEditing?(textField) ?? true
-        }
-
+        return delegate?.textFieldShouldBeginEditing?(textField) ?? true
+    }
+    
     public func textFieldDidBeginEditing(_ textField: UITextField) {
-            delegate?.textFieldDidBeginEditing?(textField)
-        }
-
+        delegate?.textFieldDidBeginEditing?(textField)
+    }
+    
     public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldEndEditing?(textField) ?? true
-        }
-
+        return delegate?.textFieldShouldEndEditing?(textField) ?? true
+    }
+    
     public func textFieldDidEndEditing(_ textField: UITextField) {
-            delegate?.textFieldDidEndEditing?(textField)
-        }
-
+        delegate?.textFieldDidEndEditing?(textField)
+    }
+    
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
-        }
-
+        return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
+    }
+    
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldReturn?(textField) ?? true
-        }
+        return delegate?.textFieldShouldReturn?(textField) ?? true
+    }
 }

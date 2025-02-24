@@ -21,19 +21,6 @@ public class BYTextField: UIView, UITextFieldDelegate {
     private var alertMessage: String?
     private var validMessage: String?
     
-    
-    public var backColor : UIColor? {
-        didSet {
-            backView.backgroundColor = backColor
-        }
-    }
-    
-    public var textColor : UIColor? {
-        didSet {
-            textField.textColor = textColor
-        }
-    }
-    
     // MARK: COMPONENT
     
     private var backView: UIView = {
@@ -88,10 +75,19 @@ public class BYTextField: UIView, UITextFieldDelegate {
         return label
     }()
     
+    private var leftIcon: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
     // MARK: ICON VIEW WIDTH
     
     private var cleanIconWidthConstraint: NSLayoutConstraint!
     private var infoIconWidthConstraint: NSLayoutConstraint!
+    private var leftIconWidthConstraint: NSLayoutConstraint!
+    
     
     // MARK: IS VALID
     
@@ -105,13 +101,20 @@ public class BYTextField: UIView, UITextFieldDelegate {
         return characters.allSatisfy { text.contains($0) }
     }
     
+    private var leftIconString: String = ""
+    
     // MARK: INIT
     
-    public init(placeholder: String, alertMessage: String, validMessage: String, characters: [String]) {
+    public init(placeholder: String, alertMessage: String = "", validMessage: String = "", characters: [String] = [], backColor: UIColor = .systemGray.withAlphaComponent(0.2), textColor: UIColor = .black , leftIcon: String = "", leftIconColor: UIColor = .systemGray) {
         self.placeHolderText = placeholder
         self.alertMessage = alertMessage
         self.validMessage = validMessage
         self.characters = characters
+        self.backView.backgroundColor = backColor
+        self.textField.textColor = textColor
+        self.leftIconString = leftIcon
+        self.leftIcon.image = UIImage(systemName: self.leftIconString)
+        self.leftIcon.tintColor = leftIconColor
         super.init(frame: .zero)
         setupUI()
         configure()
@@ -165,11 +168,20 @@ public class BYTextField: UIView, UITextFieldDelegate {
             infoIcon.heightAnchor.constraint(equalToConstant: 20)
         ])
         
+        backView.addSubview(leftIcon)
+        leftIconWidthConstraint = leftIcon.widthAnchor.constraint(equalToConstant: self.leftIconString.isEmpty ? 0 : 20)
+        NSLayoutConstraint.activate([
+            leftIcon.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 10),
+            leftIcon.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
+            leftIcon.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
+            leftIconWidthConstraint,
+        ])
+        
         backView.addSubview(textField)
         NSLayoutConstraint.activate([
             textField.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
             textField.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
-            textField.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 20),
+            textField.leftAnchor.constraint(equalTo: leftIcon.rightAnchor, constant: 10),
             textField.rightAnchor.constraint(equalTo: infoIcon.leftAnchor, constant: -10)
         ])
         
@@ -177,7 +189,7 @@ public class BYTextField: UIView, UITextFieldDelegate {
         NSLayoutConstraint.activate([
             placeholderLabel.topAnchor.constraint(equalTo: backView.topAnchor, constant: 5),
             placeholderLabel.bottomAnchor.constraint(equalTo: backView.bottomAnchor, constant: -5),
-            placeholderLabel.leftAnchor.constraint(equalTo: backView.leftAnchor, constant: 20),
+            placeholderLabel.leftAnchor.constraint(equalTo: leftIcon.rightAnchor, constant: 10),
             placeholderLabel.rightAnchor.constraint(equalTo: infoIcon.leftAnchor, constant: -10)
         ])
         
@@ -200,6 +212,9 @@ public class BYTextField: UIView, UITextFieldDelegate {
                 cleanIconWidth: 20
             )
             setupContains()
+            if characters.isEmpty {
+                self.alertLabel.alpha = 0
+            }
         } else {
             setAnimation(
                 transform: CGAffineTransform.identity,
@@ -216,6 +231,7 @@ public class BYTextField: UIView, UITextFieldDelegate {
         }
     }
     
+    
     private func setupContains(){
         if isValidFunc() {
             setAnimation(
@@ -226,7 +242,13 @@ public class BYTextField: UIView, UITextFieldDelegate {
                 placeHolderTextColor: .systemGray,
                 infoIconColor: .systemGray
             )
+            
         } else {
+            
+            // hata için titreşim
+            
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
+            generator.impactOccurred()
             setAnimation(
                 alertLabelText: self.alertMessage,
                 alertLabelTextColor: .systemRed,
@@ -237,6 +259,7 @@ public class BYTextField: UIView, UITextFieldDelegate {
                 cleanIconWidth: 20,
                 infoIconWidth: 20
             )
+            
         }
     }
     
@@ -296,28 +319,28 @@ public class BYTextField: UIView, UITextFieldDelegate {
 extension BYTextField {
     
     // MARK: - UITextFieldDelegate Methods
-        
+    
     public func textFieldShouldBeginEditing(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldBeginEditing?(textField) ?? true
-        }
-
+        return delegate?.textFieldShouldBeginEditing?(textField) ?? true
+    }
+    
     public func textFieldDidBeginEditing(_ textField: UITextField) {
-            delegate?.textFieldDidBeginEditing?(textField)
-        }
-
+        delegate?.textFieldDidBeginEditing?(textField)
+    }
+    
     public func textFieldShouldEndEditing(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldEndEditing?(textField) ?? true
-        }
-
+        return delegate?.textFieldShouldEndEditing?(textField) ?? true
+    }
+    
     public func textFieldDidEndEditing(_ textField: UITextField) {
-            delegate?.textFieldDidEndEditing?(textField)
-        }
-
+        delegate?.textFieldDidEndEditing?(textField)
+    }
+    
     public func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-            return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
-        }
-
+        return delegate?.textField?(textField, shouldChangeCharactersIn: range, replacementString: string) ?? true
+    }
+    
     public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-            return delegate?.textFieldShouldReturn?(textField) ?? true
-        }
+        return delegate?.textFieldShouldReturn?(textField) ?? true
+    }
 }
